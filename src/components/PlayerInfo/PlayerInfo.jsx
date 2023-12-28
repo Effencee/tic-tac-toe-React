@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 
-function PlayerInfo({ name, symbol, isActive }) {
+function PlayerInfo({ name, symbol, isActive, onChangeName }) {
   const [isEditing, setIsEditing] = useState(false);
   const [enteredName, setEnteredName] = useState(name);
 
   function clickHandler() {
-    setIsEditing(editing=>!editing);
+    setIsEditing((editing) => !editing);
+    if (isEditing) {
+      onChangeName(symbol, enteredName);
+    }
   }
 
   function changeNameHandler(e) {
@@ -13,7 +16,7 @@ function PlayerInfo({ name, symbol, isActive }) {
   }
 
   return (
-    <li className={isActive?'active':undefined}>
+    <li className={isActive ? "active" : undefined}>
       <span className="player">
         {isEditing ? (
           <input
@@ -22,9 +25,7 @@ function PlayerInfo({ name, symbol, isActive }) {
             required
           ></input>
         ) : (
-          <span className="player-name">
-            {enteredName}
-          </span>
+          <span className="player-name">{enteredName}</span>
         )}
         <span className="player-symbol">{symbol}</span>
         <button onClick={clickHandler}>{isEditing ? "Save" : "Edit"}</button>
