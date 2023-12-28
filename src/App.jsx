@@ -5,7 +5,12 @@ import Log from "./components/Logs/Log";
 import { WINNING_COMBINATIONS } from "./WinningCombinations";
 import GameOver from "./components/GameOver/GameOver";
 
-const initialGameBoard = [
+const PLAYERS = {
+  X:'Player 1',
+  O:'Player 2'
+}
+
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
@@ -19,16 +24,8 @@ function deriveActivePlayer(gameTurns) {
   return currentPlayer;
 }
 
-function App() {
-  const [players, setPlayer] = useState({
-    X: 'Player 1',
-    O: 'Player 2'
-  });
-  const [gameTurns, setGameTurns] = useState([]);
-
-  const activePlayer = deriveActivePlayer(gameTurns);
-
-  let gameBoard = [...initialGameBoard.map(array=>[...array])];
+function deriveGameBoard(gameTurns) {
+  let gameBoard = [...INITIAL_GAME_BOARD.map((array) => [...array])];
 
   for (const turn of gameTurns) {
     const { square, player } = turn;
@@ -36,7 +33,10 @@ function App() {
 
     gameBoard[row][col] = player;
   }
+  return gameBoard;
+}
 
+function deriveWinner(gameBoard, players) {
   let winner = null;
 
   for (const combination of WINNING_COMBINATIONS) {
@@ -55,6 +55,18 @@ function App() {
       winner = players[firstSquareSymbol];
     }
   }
+  return winner;
+}
+
+function App() {
+  const [players, setPlayer] = useState(PLAYERS);
+  const [gameTurns, setGameTurns] = useState([]);
+
+  const gameBoard = deriveGameBoard(gameTurns);
+
+  const activePlayer = deriveActivePlayer(gameTurns);
+
+  const winner = deriveWinner(gameBoard, players);
 
   const hasDraw = gameTurns.length === 9 && !winner;
 
@@ -71,17 +83,17 @@ function App() {
     });
   }
 
-  function restartHandler(){
+  function restartHandler() {
     setGameTurns([]);
   }
 
-  function nameChangeHandler(symbol, newName){
-    setPlayer((prevNames)=>{
+  function nameChangeHandler(symbol, newName) {
+    setPlayer((prevNames) => {
       return {
         ...prevNames,
-        [symbol]:newName
-      }
-    })
+        [symbol]: newName,
+      };
+    });
   }
 
   return (
@@ -89,13 +101,13 @@ function App() {
       <div id="game-container">
         <ol id="players" className="highlight-player">
           <PlayerInfo
-            name="Player 1"
+            name={PLAYERS.X}
             symbol="X"
             isActive={activePlayer === "X"}
             onChangeName={nameChangeHandler}
           />
           <PlayerInfo
-            name="Player 2"
+            name={PLAYERS.O}
             symbol="O"
             isActive={activePlayer === "O"}
             onChangeName={nameChangeHandler}
